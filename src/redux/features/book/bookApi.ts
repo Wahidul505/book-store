@@ -1,3 +1,4 @@
+import { IBook } from "../../../types/book";
 import { api } from "../../api/apiSlice";
 
 const bookApi = api.injectEndpoints({
@@ -8,7 +9,18 @@ const bookApi = api.injectEndpoints({
     getLatestBooks: builder.query({
       query: () => "/books/latest-books",
     }),
+    addNewBook: builder.mutation({
+      query: (bookData: IBook) => ({
+        url: "/books/add-book",
+        method: "POST",
+        body: bookData,
+      }),
+    }),
   }),
 });
 
-export const { useGetBooksQuery, useGetLatestBooksQuery } = bookApi;
+export const {
+  useGetBooksQuery,
+  useGetLatestBooksQuery,
+  useAddNewBookMutation,
+} = bookApi;
