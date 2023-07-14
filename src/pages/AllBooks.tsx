@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import BookCard from "../components/BookCard";
 import { useGetBooksQuery } from "../redux/features/book/bookApi";
 import { useAppDispatch, useAppSelector } from "../redux/hook";
@@ -10,6 +10,7 @@ import {
   setFilterOption,
   setSearchTerm,
 } from "../redux/features/book/bookSlice";
+import { Link } from "react-router-dom";
 
 const AllBooks = () => {
   const { data, isLoading, isSuccess, error } = useGetBooksQuery(undefined);
@@ -43,6 +44,12 @@ const AllBooks = () => {
   }
   return (
     <div className="pt-20 px-6 md:px-4">
+      <Link
+        to="/add-new-book"
+        className="absolute right-3.5 text-sm md:text-base z-0 font-semibold cursor-pointer text-gray-700"
+      >
+        + Add New
+      </Link>
       <div className="w-full flex justify-center flex-col md:flex-row gap-4 items-center">
         <input
           onChange={handleSearch}

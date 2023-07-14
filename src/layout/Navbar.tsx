@@ -16,7 +16,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="navbar bg-rose-400 lg:px-12 fixed">
+    <div className="navbar bg-rose-400 lg:px-12 fixed z-10">
       <div className="flex-1">
         <Link to="/" className="btn btn-ghost normal-case text-xl">
           Book Store
