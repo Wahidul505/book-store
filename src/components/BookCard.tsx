@@ -1,12 +1,16 @@
+import { useNavigate } from "react-router-dom";
 import { IBook } from "../types/book";
 import { FaPenFancy } from "react-icons/fa";
+import moment from "moment";
 interface IProps {
   book: IBook;
 }
 const BookCard = ({ book }: IProps) => {
-  const { title, author, genre, publicationDate, reviews } = book;
+  const { _id, title, author, genre, publicationDate } = book;
+  const navigate = useNavigate();
   return (
     <div
+      onClick={() => navigate(`/book-details/${_id}`)}
       className="bg-center bg-cover w-full h-96 cursor-pointer"
       style={{
         backgroundImage:
@@ -25,7 +29,7 @@ const BookCard = ({ book }: IProps) => {
             </p>
             <p className="">
               <span className="font-semibold">Published:</span>{" "}
-              {publicationDate.toString()}
+              {moment(publicationDate.toString()).format("dddd, MMMM Do YYYY")}
             </p>
           </div>
         </div>

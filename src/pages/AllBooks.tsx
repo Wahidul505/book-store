@@ -35,7 +35,10 @@ const AllBooks = () => {
     (filterOption === "genre" || filterOption === "publicationDate")
   ) {
     books = books.filter((book: IBook) =>
-      book[filterOption].toLowerCase().includes(searchTerm.toLowerCase())
+      book[filterOption]
+        .toString()
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
     );
   }
 
@@ -66,6 +69,7 @@ const AllBooks = () => {
           </option>
           <option value={"genre"}>Genre</option>
           <option value={"publicationDate"}>Published On</option>
+          <option value={""}>No category</option>
         </select>
       </div>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 px-10 mt-10 items-end gap-6">

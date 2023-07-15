@@ -6,18 +6,21 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useAddNewBookMutation } from "../redux/features/book/bookApi";
 import { useAppSelector } from "../redux/hook";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AddNewBook = () => {
   const [bookData, setBookData] = useState({
     title: "",
     author: "",
     genre: "",
-    publicationDate: "",
+    publicationDate: new Date(),
     addedBy: "",
     reviews: [],
   });
   const [error, setError] = useState("");
-  const { user } = useAppSelector((state) => state.user);
+  const [startDate, setStartDate] = useState(new Date());
+  const user = useAppSelector((state) => state.user.user);
   const [addNewBook, { data, isSuccess, isLoading, isError }] =
     useAddNewBookMutation();
 
@@ -29,8 +32,6 @@ const AddNewBook = () => {
   useEffect(() => {
     setBookData({ ...bookData, addedBy: user?.email as string });
   }, [user?.email]);
-
-  console.log(data);
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
@@ -96,24 +97,18 @@ const AddNewBook = () => {
               Genre
             </label>
           </div>
-          <div className="relative z-0 w-full mb-6 group">
-            <input
-              onChange={(e) =>
-                setBookData({ ...bookData, publicationDate: e.target.value })
-              }
-              type="text"
-              name="publicationDate"
-              id="publicationDate"
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none  dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              required
-            />
-            <label
-              htmlFor="publicationDate"
-              className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
+          <div className="relative z-0 w-full mb-6 group -mt-3">
+            <label htmlFor="publicationDate" className="text-gray-500 text-sm">
               Publication Date
             </label>
+            <DatePicker
+              showIcon
+              selected={bookData.publicationDate}
+              maxDate={new Date()}
+              onChange={(date) =>
+                setBookData({ ...bookData, publicationDate: date as Date })
+              }
+            />
           </div>
         </div>
         <div>{isError && <p>{error}</p>}</div>
