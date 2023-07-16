@@ -1,14 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Link } from "react-router-dom";
 import { IBook } from "../types/book";
 import { useGetLatestBooksQuery } from "../redux/features/book/bookApi";
 import BookCard from "../components/BookCard";
 
 const Home = () => {
-  const { data, isLoading, isSuccess, error } =
-    useGetLatestBooksQuery(undefined);
+  const { data, isLoading } = useGetLatestBooksQuery(undefined) as {
+    data: { data: IBook[] };
+    isLoading: boolean;
+  };
+  if (isLoading) return <p>Loading...</p>;
   const books: IBook[] = data?.data;
+  console.log(books);
 
   return (
     <div>

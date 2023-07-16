@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ChangeEvent } from "react";
 import BookCard from "../components/BookCard";
 import { useGetBooksQuery } from "../redux/features/book/bookApi";
@@ -13,10 +10,15 @@ import {
 import { Link } from "react-router-dom";
 
 const AllBooks = () => {
-  const { data, isLoading, isSuccess, error } = useGetBooksQuery(undefined);
+  const { data, isLoading } = useGetBooksQuery(undefined) as {
+    data: { data: IBook[] };
+    isLoading: boolean;
+  };
   const dispatch = useAppDispatch();
   const { searchTerm, filterOption } = useAppSelector((state) => state.book);
-  let books: IBook[] = data?.data;
+  if (isLoading) return <p>Loading...</p>;
+
+  let books: IBook[] = data.data;
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     dispatch(setSearchTerm(e.target.value));
@@ -42,9 +44,6 @@ const AllBooks = () => {
     );
   }
 
-  if (!books) {
-    return null;
-  }
   return (
     <div className="pt-20 px-6 md:px-4">
       <Link

@@ -4,6 +4,7 @@ import { useAppDispatch } from "./redux/hook";
 import { setLoading, setUser } from "./redux/features/user/userSlice";
 import { onAuthStateChanged } from "firebase/auth";
 import auth from "./firebase.init";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ function App() {
   return (
     <>
       <MainLayout />
+      <Toaster position="top-center" reverseOrder={false} />
     </>
   );
 }

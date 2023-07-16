@@ -4,33 +4,51 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
 import { FormEvent, useEffect, useState } from "react";
-import { useAddNewBookMutation } from "../redux/features/book/bookApi";
+import {
+  useEditBookMutation,
+  useGetSingleBookQuery,
+} from "../redux/features/book/bookApi";
 import { useAppSelector } from "../redux/hook";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useParams } from "react-router-dom";
+import ReactDatePicker from "react-datepicker";
+import { toast } from "react-hot-toast";
 
-const AddNewBook = () => {
+const EditBook = () => {
+  const { id } = useParams();
   const [bookData, setBookData] = useState({
     title: "",
     author: "",
     genre: "",
     publicationDate: new Date(),
-    addedBy: "",
-    reviews: [],
   });
-  const [error, setError] = useState("");
+
   const user = useAppSelector((state) => state.user.user);
-  const [addNewBook, { data, isSuccess, isLoading, isError }] =
-    useAddNewBookMutation();
+  const { data, isLoading } = useGetSingleBookQuery(id);
+  const [editBook, { isSuccess, isLoading: isEditLoading }] =
+    useEditBookMutation();
+  useEffect(() => {
+    if (!isLoading && data.data) {
+      setBookData({
+        title: data.data.title,
+        author: data.data.author,
+        genre: data.data.genre,
+        publicationDate: new Date(data.data.publicationDate),
+      });
+    }
+  }, [data, isLoading]);
+
+  if (isLoading) return <div>Loading...</div>;
 
   const handleSetBookData = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addNewBook(bookData);
+    if (id && user.email) {
+      editBook({ id, user: user.email, bookData });
+    }
+    if (isSuccess) {
+      toast.success("Edited Successfully");
+    }
   };
-
-  useEffect(() => {
-    setBookData({ ...bookData, addedBy: user?.email as string });
-  }, [user?.email]);
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
@@ -43,6 +61,7 @@ const AddNewBook = () => {
             onChange={(e) =>
               setBookData({ ...bookData, title: e.target.value })
             }
+            value={bookData.title}
             type="text"
             name="title"
             id="title"
@@ -62,6 +81,7 @@ const AddNewBook = () => {
             onChange={(e) =>
               setBookData({ ...bookData, author: e.target.value })
             }
+            value={bookData.author}
             type="text"
             name="author"
             id="author"
@@ -82,6 +102,7 @@ const AddNewBook = () => {
               onChange={(e) =>
                 setBookData({ ...bookData, genre: e.target.value })
               }
+              value={bookData.genre}
               type="text"
               name="genre"
               id="genre"
@@ -100,26 +121,33 @@ const AddNewBook = () => {
             <label htmlFor="publicationDate" className="text-gray-500 text-sm">
               Publication Date
             </label>
-            <DatePicker
+            <ReactDatePicker
               showIcon
               selected={bookData.publicationDate}
               maxDate={new Date()}
               onChange={(date) =>
-                setBookData({ ...bookData, publicationDate: date as Date })
+                setBookData({
+                  ...bookData,
+                  publicationDate: date as Date,
+                })
               }
             />
           </div>
         </div>
-        <div>{isError && <p>{error}</p>}</div>
         <button
           type="submit"
+          disabled={isEditLoading}
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Add Book
+          {isEditLoading ? (
+            <span className="loading loading-dots loading-xs"></span>
+          ) : (
+            "Update"
+          )}
         </button>
       </form>
     </div>
   );
 };
 
-export default AddNewBook;
+export default EditBook;

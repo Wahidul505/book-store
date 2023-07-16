@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
+  useDeleteBookMutation,
   useGetSingleBookQuery,
   usePostReviewMutation,
 } from "../redux/features/book/bookApi";
@@ -10,31 +14,58 @@ import { TbCategory2 } from "react-icons/tb";
 import { BsCalendar2Date } from "react-icons/bs";
 import moment from "moment";
 import Review from "../components/Review";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useAppSelector } from "../redux/hook";
+import { toast } from "react-hot-toast";
 
 const BookDetails = () => {
   const { id } = useParams();
   const [review, setReview] = useState("");
-  const { data, isLoading } = useGetSingleBookQuery(id, {
+  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.user);
+  const { data, isLoading, isError } = useGetSingleBookQuery(id, {
     refetchOnMountOrArgChange: true,
   }) as {
     isLoading: boolean;
+    isError: boolean;
     data: { data: IBook };
   };
-  const [postReview, { isError, isSuccess }] = usePostReviewMutation();
+  const [postReview, { isError: isPostReviewError }] = usePostReviewMutation();
+  const [
+    deleteBook,
+    {
+      isError: isDeleteBookError,
+      isLoading: isDeleteBookLoading,
+      isSuccess: isDeleteBookSuccess,
+    },
+  ] = useDeleteBookMutation();
+
+  useEffect(() => {
+    isDeleteBookSuccess && toast.success("Book deleted successfully");
+    isDeleteBookError && toast.error("Something went wrong");
+    isDeleteBookSuccess && navigate("/");
+    isError && navigate("/");
+    isPostReviewError && toast.error("Something went wrong");
+  }, [isDeleteBookError, isDeleteBookSuccess, isError, isPostReviewError]);
 
   if (isLoading) return <div>Loading...</div>;
 
-  const { title, genre, author, publicationDate, reviews } = data.data;
+  const { title, genre, author, publicationDate, reviews, addedBy } = data.data;
 
   const handlePostReview = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const options = {
-      id: id as string,
-      reviewData: review,
-    };
-    postReview(options);
-    setReview("");
+    if (review) {
+      const options = {
+        id: id as string,
+        reviewData: review,
+      };
+      postReview(options);
+      setReview("");
+    }
+  };
+
+  const handleDeleteBook = () => {
+    deleteBook({ id, user: user.email } as { id: string; user: string });
   };
 
   return (
@@ -69,6 +100,29 @@ const BookDetails = () => {
           </div>
         </div>
       </div>
+
+      {user.email === addedBy && (
+        <div
+          className="inline-flex rounded-md shadow-sm justify-end w-full pr-4 pt-6"
+          role="group"
+        >
+          <button
+            onClick={() => navigate(`/edit-book/${id as string}`)}
+            type="button"
+            className="px-4 py-2 text-sm font-medium  border rounded-l-lg focus:z-10 focus:ring-2 bg-amber-500 border-amber-600 text-white hover:bg-amber-600"
+          >
+            Edit
+          </button>
+
+          <label
+            htmlFor="my_modal_6"
+            className="px-4 py-2 text-sm font-medium  border rounded-r-lg focus:z-10 focus:ring-2 bg-rose-500 border-rose-600 text-white hover:bg-rose-600 cursor-pointer"
+          >
+            Delete
+          </label>
+        </div>
+      )}
+
       <div className="mt-8">
         <div className="grid h-12 bg-primary place-items-center">Reviews</div>
         <div className="px-8 py-6">
@@ -88,6 +142,36 @@ const BookDetails = () => {
             ))}
         </div>
       </div>
+      {/* modal for delete */}
+      {true && (
+        <>
+          {" "}
+          <input type="checkbox" id="my_modal_6" className="modal-toggle" />
+          <div className="modal">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">
+                Make sure you want to delete the book
+              </h3>
+              <div className="flex gap-3 items-center justify-end mt-3">
+                <button
+                  disabled={isDeleteBookLoading}
+                  onClick={handleDeleteBook}
+                  className="btn btn-error hover:bg-red-500 hover:text-white"
+                >
+                  {isDeleteBookLoading ? (
+                    <span className="loading loading-dots loading-xs"></span>
+                  ) : (
+                    "Delete"
+                  )}
+                </button>
+                <label htmlFor="my_modal_6" className="btn">
+                  Close!
+                </label>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
