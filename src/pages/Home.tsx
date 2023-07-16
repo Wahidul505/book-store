@@ -23,8 +23,8 @@ const Home = () => {
           <div className="max-w-md">
             <h1 className="mb-5 text-5xl font-bold">Hello there</h1>
             <p className="mb-5">
-              Purchase your favourite books from our book store. You can also
-              add your favourite books in your wishlist.
+              Purchase your favorite books from our book store. You can also add
+              your favorite books in your wishlist.
             </p>
             <Link to="/all-books" className="btn btn-primary">
               Get Started

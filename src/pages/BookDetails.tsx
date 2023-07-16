@@ -1,22 +1,41 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { useParams } from "react-router-dom";
-import { useGetSingleBookQuery } from "../redux/features/book/bookApi";
+import {
+  useGetSingleBookQuery,
+  usePostReviewMutation,
+} from "../redux/features/book/bookApi";
 import { IBook } from "../types/book";
 import { LuPenTool } from "react-icons/lu";
 import { TbCategory2 } from "react-icons/tb";
 import { BsCalendar2Date } from "react-icons/bs";
 import moment from "moment";
 import Review from "../components/Review";
+import { FormEvent, useState } from "react";
 
 const BookDetails = () => {
   const { id } = useParams();
-  const { data, isLoading } = useGetSingleBookQuery(id) as {
+  const [review, setReview] = useState("");
+  const { data, isLoading } = useGetSingleBookQuery(id, {
+    refetchOnMountOrArgChange: true,
+  }) as {
     isLoading: boolean;
     data: { data: IBook };
   };
+  const [postReview, { isError, isSuccess }] = usePostReviewMutation();
 
   if (isLoading) return <div>Loading...</div>;
 
   const { title, genre, author, publicationDate, reviews } = data.data;
+
+  const handlePostReview = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const options = {
+      id: id as string,
+      reviewData: review,
+    };
+    postReview(options);
+    setReview("");
+  };
 
   return (
     <div className="pt-32">
@@ -52,7 +71,17 @@ const BookDetails = () => {
       </div>
       <div className="mt-8">
         <div className="grid h-12 bg-primary place-items-center">Reviews</div>
-        <div>
+        <div className="px-8 py-6">
+          <form onSubmit={handlePostReview} className="flex gap-3 mb-4">
+            <input
+              onChange={(e) => setReview(e.target.value)}
+              value={review}
+              type="text"
+              placeholder="Drop a review"
+              className="input input-bordered rounded w-full max-w-3xl"
+            />
+            <button className="btn rounded">Post</button>
+          </form>
           {reviews.length &&
             reviews.map((review, index) => (
               <Review key={index} review={review} />
