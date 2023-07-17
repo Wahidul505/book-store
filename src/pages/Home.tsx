@@ -2,15 +2,15 @@ import { Link } from "react-router-dom";
 import { IBook } from "../types/book";
 import { useGetLatestBooksQuery } from "../redux/features/book/bookApi";
 import BookCard from "../components/BookCard";
+import Loading from "../components/Loading";
 
 const Home = () => {
   const { data, isLoading } = useGetLatestBooksQuery(undefined) as {
     data: { data: IBook[] };
     isLoading: boolean;
   };
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Loading />;
   const books: IBook[] = data?.data;
-  console.log(books);
 
   return (
     <div>

@@ -26,6 +26,16 @@ const Navbar = () => {
         <div className="form-control text-white mr-4">
           <Link to="/all-books">All Books</Link>
         </div>
+        {user?.email && (
+          <div className="form-control text-white mr-4">
+            <Link to="/wish-list">Wish list</Link>
+          </div>
+        )}
+        {user?.email && (
+          <div className="form-control text-white mr-4">
+            <Link to="/add-new-book">Add Book</Link>
+          </div>
+        )}
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
             <div className="w-10 rounded-full">

@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React, { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hook";
 import { loginUser } from "../redux/features/user/userSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const SignIn = () => {
   const dispatch = useAppDispatch();
@@ -10,6 +14,8 @@ const SignIn = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,9 +28,11 @@ const SignIn = () => {
 
   useEffect(() => {
     if (user.email && !isLoading) {
-      navigate("/");
+      navigate(from, { replace: true });
     }
-  }, [user?.email, isLoading]);
+  }, [user?.email, isLoading, from, navigate]);
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">

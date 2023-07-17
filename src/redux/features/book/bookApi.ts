@@ -21,6 +21,7 @@ const bookApi = api.injectEndpoints({
         method: "POST",
         body: bookData,
       }),
+      invalidatesTags: ["books"],
     }),
     postReview: builder.mutation({
       query: ({ id, reviewData }: { id: string; reviewData: string }) => ({

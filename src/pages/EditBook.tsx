@@ -10,12 +10,14 @@ import {
 } from "../redux/features/book/bookApi";
 import { useAppSelector } from "../redux/hook";
 import "react-datepicker/dist/react-datepicker.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ReactDatePicker from "react-datepicker";
 import { toast } from "react-hot-toast";
+import Loading from "../components/Loading";
 
 const EditBook = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [bookData, setBookData] = useState({
     title: "",
     author: "",
@@ -36,17 +38,18 @@ const EditBook = () => {
         publicationDate: new Date(data.data.publicationDate),
       });
     }
-  }, [data, isLoading]);
+    if (isSuccess) {
+      navigate(`/book-details/${id as string}`);
+      toast.success("Book edited successfully");
+    }
+  }, [data, isLoading, id, isSuccess]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
 
   const handleSetBookData = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (id && user.email) {
       editBook({ id, user: user.email, bookData });
-    }
-    if (isSuccess) {
-      toast.success("Edited Successfully");
     }
   };
 

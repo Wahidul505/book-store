@@ -2,7 +2,8 @@
 import React, { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hook";
 import { createUser } from "../redux/features/user/userSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const SignUp = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +27,9 @@ const SignUp = () => {
     if (user.email && !isLoading) {
       navigate("/");
     }
-  }, [user?.email, isLoading]);
+  }, [user?.email, isLoading, navigate]);
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
@@ -63,6 +66,9 @@ const SignUp = () => {
             <button className="btn btn-primary" type="submit">
               Create account
             </button>
+          </div>
+          <div className="text-end mt-3 underline text-gray-600">
+            <Link to="/sign-in">Want to Sign in?</Link>
           </div>
         </div>
       </form>

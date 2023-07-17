@@ -8,6 +8,9 @@ import { useAddNewBookMutation } from "../redux/features/book/bookApi";
 import { useAppSelector } from "../redux/hook";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
+import { toast } from "react-hot-toast";
 
 const AddNewBook = () => {
   const [bookData, setBookData] = useState({
@@ -18,9 +21,9 @@ const AddNewBook = () => {
     addedBy: "",
     reviews: [],
   });
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.user.user);
-  const [addNewBook, { data, isSuccess, isLoading, isError }] =
+  const [addNewBook, { isSuccess, isLoading, isError }] =
     useAddNewBookMutation();
 
   const handleSetBookData = (e: FormEvent<HTMLFormElement>) => {
@@ -30,7 +33,12 @@ const AddNewBook = () => {
 
   useEffect(() => {
     setBookData({ ...bookData, addedBy: user?.email as string });
-  }, [user?.email]);
+    isSuccess && navigate("/all-books");
+    isSuccess && toast.success("Added new book");
+    isError && toast.error("Failed to add book, try again later");
+  }, [user?.email, navigate, isSuccess, isError]);
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
@@ -110,7 +118,6 @@ const AddNewBook = () => {
             />
           </div>
         </div>
-        <div>{isError && <p>{error}</p>}</div>
         <button
           type="submit"
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

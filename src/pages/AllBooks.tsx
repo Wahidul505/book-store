@@ -8,6 +8,7 @@ import {
   setSearchTerm,
 } from "../redux/features/book/bookSlice";
 import { Link } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const AllBooks = () => {
   const { data, isLoading } = useGetBooksQuery(undefined) as {
@@ -15,8 +16,9 @@ const AllBooks = () => {
     isLoading: boolean;
   };
   const dispatch = useAppDispatch();
-  const { searchTerm, filterOption } = useAppSelector((state) => state.book);
-  if (isLoading) return <p>Loading...</p>;
+  const { book, user } = useAppSelector((state) => state);
+  const { searchTerm, filterOption } = book;
+  if (isLoading) return <Loading />;
 
   let books: IBook[] = data.data;
 
@@ -46,12 +48,14 @@ const AllBooks = () => {
 
   return (
     <div className="pt-20 px-6 md:px-4">
-      <Link
-        to="/add-new-book"
-        className="absolute right-3.5 text-sm md:text-base z-0 font-semibold cursor-pointer text-gray-700"
-      >
-        + Add New
-      </Link>
+      {user.user.email && (
+        <Link
+          to="/add-new-book"
+          className="absolute right-3.5 text-sm md:text-base z-0 font-semibold cursor-pointer text-gray-700"
+        >
+          + Add New
+        </Link>
+      )}
       <div className="w-full flex justify-center flex-col md:flex-row gap-4 items-center">
         <input
           onChange={handleSearch}
